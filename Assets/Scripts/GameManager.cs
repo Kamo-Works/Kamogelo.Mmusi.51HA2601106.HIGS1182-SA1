@@ -10,6 +10,9 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI highScoreText;
+    public float difficultyTimer = 0f;
+    public float difficultyInterval = 10f;
+    public float difficultyMultiplier = 1f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -19,7 +22,13 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        difficultyTimer += Time.deltaTime;
+
+        if (difficultyTimer >= difficultyInterval)
+        {
+            difficultyTimer = 0f;
+            IncreaseDifficulty();
+        }
     }
     public void AddScore(int amount)
     {
@@ -40,5 +49,10 @@ public class GameManager : MonoBehaviour
         Debug.Log("Restarting game");
         score = 0;
         SceneManager.LoadScene("Gameplay");
+    }
+    void IncreaseDifficulty()
+    {
+        difficultyMultiplier += 0.2f;
+        Debug.Log("Difficulty increased: " + difficultyMultiplier);
     }
 }
