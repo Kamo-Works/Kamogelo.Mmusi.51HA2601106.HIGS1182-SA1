@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
     public int score = 0;
+    public TextMeshProUGUI scoreText;
+    public GameObject gameOverPanel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -24,5 +26,16 @@ public class GameManager : MonoBehaviour
         Debug.Log("Score " + score);
         scoreText.text = "Score: " + score;
     }
-    public TextMeshProUGUI scoreText;
+   
+    public void GameOver()
+    {
+        Debug.Log("Game Over triggered");
+        gameOverPanel.SetActive(true);
+    }
+    public void RestartGame()
+    {
+        Debug.Log("Restarting game");
+        score = 0;
+        SceneManager.LoadScene("Gameplay");
+    }
 }

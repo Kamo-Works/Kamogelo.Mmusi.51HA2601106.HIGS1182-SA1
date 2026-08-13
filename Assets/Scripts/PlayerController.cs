@@ -39,7 +39,8 @@ public class PlayerController : MonoBehaviour
 
         if (health <= 0)
         {
-            Debug.Log("Game Over");
+            GameManager.instance.GameOver();
         }
     }
+
 }
