@@ -6,7 +6,8 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public GameObject laserPrefab;
-    public Transform firePoint; 
+    public Transform firePoint;
+    public int health = 3;
     // ← lives here, outside any method
 
     void Start()
@@ -30,5 +31,15 @@ public class PlayerController : MonoBehaviour
     {
         Instantiate(laserPrefab, firePoint.position, firePoint.rotation);
         Debug.Log("Player fired");
+    }
+    public void TakeDamage(int amount)
+    {
+        health -= amount;
+        Debug.Log("Player health: " + health);
+
+        if (health <= 0)
+        {
+            Debug.Log("Game Over");
+        }
     }
 }
