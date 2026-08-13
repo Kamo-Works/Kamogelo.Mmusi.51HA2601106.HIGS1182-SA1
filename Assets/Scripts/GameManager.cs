@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public int score = 0;
     public TextMeshProUGUI scoreText;
     public GameObject gameOverPanel;
+    public TextMeshProUGUI highScoreText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -30,6 +31,8 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Debug.Log("Game Over triggered");
+        SaveManager.instance.SaveHighScore(score);
+        highScoreText.text = "High Score: " + SaveManager.instance.LoadHighScore();
         gameOverPanel.SetActive(true);
     }
     public void RestartGame()
