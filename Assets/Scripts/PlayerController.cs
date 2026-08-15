@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     public GameObject laserPrefab;
     public Transform firePoint;
     public int health = 3;
+    public AnimationController animationController;
     // ← lives here, outside any method
 
     void Start()
@@ -22,6 +23,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 movement = new Vector3(horizontal, 0f, vertical);
         transform.Translate(movement * moveSpeed * Time.deltaTime, Space.World);
+        bool isMoving = horizontal !=0f || vertical !=0f;
+        animationController.SetMoving(isMoving);
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Shoot();
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour
     {
         Instantiate(laserPrefab, firePoint.position, firePoint.rotation);
         Debug.Log("Player fired");
+        animationController.TriggerShoot();
     }
     public void TakeDamage(int amount)
     {
@@ -39,7 +43,9 @@ public class PlayerController : MonoBehaviour
 
         if (health <= 0)
         {
+            animationController.TriggerDie();
             GameManager.instance.GameOver();
+
         }
     }
 
