@@ -20,7 +20,9 @@ public class Collectible : MonoBehaviour
         {
             GameManager.instance.AddScore(scoreValue);
             Debug.Log("Collectible picked up");
+            AudioManager.instance.PlaySound(AudioManager.instance.pickupSound);
             Destroy(gameObject);
+           
         }
     }
 }

@@ -18,12 +18,12 @@ public class Projectile : MonoBehaviour
     {
         
     }
-    private void OnAnimatorIK(int layerIndex)
-    {
+    
+    
         void OnTriggerEnter(Collider other)
         {
             Debug.Log("Laser hit: " + other.name);
             Destroy(gameObject);
         } 
-    }
+    
 }

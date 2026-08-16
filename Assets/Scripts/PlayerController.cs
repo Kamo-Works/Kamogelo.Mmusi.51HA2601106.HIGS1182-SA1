@@ -35,17 +35,19 @@ public class PlayerController : MonoBehaviour
         Instantiate(laserPrefab, firePoint.position, firePoint.rotation);
         Debug.Log("Player fired");
         animationController.TriggerShoot();
+        AudioManager.instance.PlaySound(AudioManager.instance.shootSound);
     }
     public void TakeDamage(int amount)
     {
         health -= amount;
         Debug.Log("Player health: " + health);
+        AudioManager.instance.PlaySound(AudioManager.instance.hitSound);
 
         if (health <= 0)
         {
             animationController.TriggerDie();
             GameManager.instance.GameOver();
-
+           
         }
     }
 
