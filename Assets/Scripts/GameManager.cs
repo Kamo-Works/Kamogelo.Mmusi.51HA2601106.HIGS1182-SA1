@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     public void GameOver()
     {
         Debug.Log("Game Over triggered");
+        AudioManager.instance.PlaySound(AudioManager.instance.hitSound);
         SaveManager.instance.SaveHighScore(score);
         highScoreText.text = "High Score: " + SaveManager.instance.LoadHighScore();
         gameOverPanel.SetActive(true);
