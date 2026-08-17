@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
     public float difficultyTimer = 0f;
     public float difficultyInterval = 10f;
     public float difficultyMultiplier = 1f;
+    public GameObject pausePanel;
+    private bool isPaused = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -28,6 +30,10 @@ public class GameManager : MonoBehaviour
         {
             difficultyTimer = 0f;
             IncreaseDifficulty();
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
         }
     }
     public void AddScore(int amount)
@@ -50,6 +56,17 @@ public class GameManager : MonoBehaviour
         Debug.Log("Restarting game");
         score = 0;
         SceneManager.LoadScene("Gameplay");
+    }
+    public void TogglePause()
+    {
+        isPaused = !isPaused;
+        pausePanel.SetActive(isPaused);
+        Time.timeScale = isPaused ? 0f : 1f;
+    }
+    public void ExitGame()
+    {
+        Debug.Log("Exiting game");
+        Application.Quit();
     }
     void IncreaseDifficulty()
     {
