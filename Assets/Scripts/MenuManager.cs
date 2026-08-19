@@ -6,24 +6,20 @@ using TMPro;
 
 public class MenuManager : MonoBehaviour
 {
-    public GameObject gameOverPanel;
     public TextMeshProUGUI highScoreText;
-    public void GameOver()
-    {
-        Debug.Log("Game Over triggered");
-        gameOverPanel.SetActive(true);
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
+        // Show the saved high score as soon as the Main Menu loads
         highScoreText.text = "High Score: " + PlayerPrefs.GetInt("HighScore", 0);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+    // Called by the Start button - loads the Gameplay scene
     public void StartGame()
     {
         Debug.Log("Loading Gameplay scene");

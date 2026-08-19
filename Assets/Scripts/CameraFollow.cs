@@ -2,15 +2,16 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    public Transform target;
-    public Vector3 offset = new Vector3(0f, 4f, -6);
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public Transform target;                              // The player the camera should follow
+    public Vector3 offset = new Vector3(0f, 4f, -6);       // Distance/height behind the player
+
     void Start()
     {
-        
+
     }
 
-    // Update is called once per frame
+    // Keeps the camera positioned behind the player, rotating along with the player's facing
+    // direction, and always looking at the player
     void LateUpdate()
     {
         if (target != null)

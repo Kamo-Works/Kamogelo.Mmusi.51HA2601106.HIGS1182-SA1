@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class Collectible : MonoBehaviour
 {
-    public int scoreValue = 10;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public int scoreValue = 10;   // How much score this collectible is worth
+
     void Start()
     {
-        
+
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+    // Adds score, plays pickup sound, and removes the object when the player touches it
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -22,7 +23,6 @@ public class Collectible : MonoBehaviour
             Debug.Log("Collectible picked up");
             AudioManager.instance.PlaySound(AudioManager.instance.pickupSound);
             Destroy(gameObject);
-           
         }
     }
 }
