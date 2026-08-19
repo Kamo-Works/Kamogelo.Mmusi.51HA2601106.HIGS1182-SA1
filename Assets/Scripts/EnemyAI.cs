@@ -4,28 +4,36 @@ public class EnemyAI : MonoBehaviour
 {
     public float moveSpeed = 3f;
     private Transform player;
+
     private bool canDamage = true;
-    public float damageCooldown = 1f;
+    public float damageCooldown = 1f;  // Time between repeated damage ticks while touching the player
+
+    // --- Adapted from Sebastian Lague's Field of View system (github.com/SebLague/Field-of-View) ---
+    // Original script detected multiple targets via a layer mask and returned a list of visible targets.
+    // Simplified here into a single true/false check (CanSeePlayer) against one known target,
+    // since this enemy only ever needs to know if it can see the Player specifically.
+    // The original's obstacle raycast/layer mask was removed since this scene has no obstacle
+    // layers set up yet - the adapted version only checks angle and distance.
     public float viewRadius = 10f;
     public float viewAngle = 90f;
-      
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        // Find the Player once at the start rather than searching every frame
         player = GameObject.FindGameObjectWithTag("Player").transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        // Only chase if the player is within the enemy's field of view
         if (CanSeePlayer())
         {
             float currentSpeed = moveSpeed * GameManager.instance.difficultyMultiplier;
             transform.position = Vector3.MoveTowards(transform.position, player.position, currentSpeed * Time.deltaTime);
         }
-       
     }
+
+    // Deals damage repeatedly while the enemy stays in contact with the player, limited by a cooldown
     void OnTriggerStay(Collider other)
     {
         if (other.CompareTag("Player") && canDamage)
@@ -37,14 +45,17 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+    // Re-enables damage after the cooldown period has passed
     void ResetDamage()
     {
         canDamage = true;
     }
+
+    // Returns true if the player is within the enemy's view angle and view radius
     bool CanSeePlayer()
     {
-        Vector3 dirToPlayer = (player.position -transform.position).normalized;
-        
+        Vector3 dirToPlayer = (player.position - transform.position).normalized;
+
         if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
         {
             float dstToPlayer = Vector3.Distance(transform.position, player.position);
@@ -53,6 +64,7 @@ public class EnemyAI : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
 }

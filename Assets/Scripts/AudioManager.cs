@@ -2,32 +2,33 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager instance;
+    public static AudioManager instance;   // Single shared reference so any script can play sounds easily
 
-    public AudioSource musicSource;
-    public AudioSource sfxSource;
+    public AudioSource musicSource;        // Dedicated source for looping background music
+    public AudioSource sfxSource;          // Dedicated source for one-off sound effects
 
     public AudioClip backgroundMusic;
     public AudioClip pickupSound;
     public AudioClip shootSound;
     public AudioClip hitSound;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
         instance = this;
+
+        // Start background music looping immediately when the game begins
         musicSource.clip = backgroundMusic;
         musicSource.loop = true;
         musicSource.Play();
     }
 
-    // Update is called once per frame
     void Update()
     {
-
     }
+
+    // Plays a one-off sound effect without interrupting the music or any other sound currently playing
     public void PlaySound(AudioClip clip)
     {
         sfxSource.PlayOneShot(clip);
     }
-   
 }

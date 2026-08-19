@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class SaveManager : MonoBehaviour
 {
-    public static SaveManager instance;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public static SaveManager instance;    // Single shared reference so other scripts can save/load easily
+
     void Start()
     {
         instance = this;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+    // Saves the given score as the new high score, but only if it beats the current one
     public void SaveHighScore(int score)
     {
         int currentHighScore = PlayerPrefs.GetInt("HighScore", 0);
@@ -26,6 +27,7 @@ public class SaveManager : MonoBehaviour
         }
     }
 
+    // Returns the currently saved high score, or 0 if none has been saved yet
     public int LoadHighScore()
     {
         return PlayerPrefs.GetInt("HighScore", 0);
