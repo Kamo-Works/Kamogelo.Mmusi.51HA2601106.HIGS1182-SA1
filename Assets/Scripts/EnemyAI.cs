@@ -6,6 +6,9 @@ public class EnemyAI : MonoBehaviour
     private Transform player;
     private bool canDamage = true;
     public float damageCooldown = 1f;
+    public float viewRadius = 10f;
+    public float viewAngle = 90f;
+      
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -16,8 +19,12 @@ public class EnemyAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        float currentSpeed = moveSpeed * GameManager.instance.difficultyMultiplier;
-        transform.position = Vector3.MoveTowards(transform.position, player.position, currentSpeed * Time.deltaTime);
+        if (CanSeePlayer())
+        {
+            float currentSpeed = moveSpeed * GameManager.instance.difficultyMultiplier;
+            transform.position = Vector3.MoveTowards(transform.position, player.position, currentSpeed * Time.deltaTime);
+        }
+       
     }
     void OnTriggerStay(Collider other)
     {
@@ -33,5 +40,19 @@ public class EnemyAI : MonoBehaviour
     void ResetDamage()
     {
         canDamage = true;
+    }
+    bool CanSeePlayer()
+    {
+        Vector3 dirToPlayer = (player.position -transform.position).normalized;
+        
+        if (Vector3.Angle(transform.forward, dirToPlayer) < viewAngle / 2)
+        {
+            float dstToPlayer = Vector3.Distance(transform.position, player.position);
+            if (dstToPlayer < viewRadius)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

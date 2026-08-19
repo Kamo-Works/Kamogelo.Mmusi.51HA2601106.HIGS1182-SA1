@@ -15,8 +15,9 @@ public class CameraFollow : MonoBehaviour
     {
         if (target != null)
         {
-            transform.position = target.position + offset;
+            Vector3 rotatedOffset = target.rotation * offset;
+            transform.position = target.position + rotatedOffset;
+            transform.LookAt(target.position);
         }
-
     }
 }
