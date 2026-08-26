@@ -9,13 +9,26 @@ public class PlayerController : MonoBehaviour
     public Transform firePoint;            // Marks where lasers spawn from (front of the player)
     public int health = 3;                 // Player's current health, starts at 3
     public AnimationController animationController; // Reference to the character's animation script
-
+    public float mouseSensitivity = 3f;
+    private float yaw;
+    private float pitch;
+    public float minPitch = -60f;
+    public float maxPitch = 60f;
+    private bool isDead = false;
     void Start()
     {
+        yaw = transform.eulerAngles.y;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
     {
+
+        if (isDead || Time.timeScale == 0f)
+        {
+            return;
+        }
         // Read movement input each frame
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
@@ -29,44 +42,64 @@ public class PlayerController : MonoBehaviour
         bool isMoving = horizontal != 0f || vertical != 0f;
         animationController.SetMoving(isMoving);
 
-        RotateTowardsMouse();
+        MouseLook();
 
-        // Fire a laser when Space is pressed
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
         {
             Shoot();
         }
     }
 
     // Spawns a laser projectile from the FirePoint and plays the shoot animation/sound
+    // Fires a visible laser bolt for feedback, while using an instant raycast
+    // to actually detect and destroy whatever was hit (asteroid or enemy)
     void Shoot()
     {
-        Instantiate(laserPrefab, firePoint.position, firePoint.rotation);
+        Instantiate(laserPrefab, firePoint.position, Camera.main.transform.rotation);
+
+        RaycastHit hit;
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, 100f))
+        {
+            Debug.Log("Raycast hit: " + hit.collider.name);
+
+            if (hit.collider.CompareTag("Asteroid"))
+            {
+                Destroy(hit.collider.gameObject);
+                Debug.Log("Asteroid destroyed by raycast");
+            }
+            else if (hit.collider.CompareTag("Enemy"))
+            {
+                Destroy(hit.collider.gameObject);
+                Debug.Log("Enemy destroyed by raycast");
+            }
+        }
+
         Debug.Log("Player fired");
         animationController.TriggerShoot();
         AudioManager.instance.PlaySound(AudioManager.instance.shootSound);
     }
 
-    // Rotates the player smoothly to face wherever the mouse cursor is pointing on the ground plane
-    void RotateTowardsMouse()
+    // Proper FPS-style mouse look: horizontal mouse movement turns the player (yaw),
+    // vertical mouse movement tilts the view up/down (pitch), clamped so you can't flip
+    // all the way around (like looking through your own body)
+    void MouseLook()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Plane groundPlane = new Plane(Vector3.up, transform.position);
-        float rayDistance;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        if (groundPlane.Raycast(ray, out rayDistance))
-        {
-            Vector3 pointToLook = ray.GetPoint(rayDistance);
-            Vector3 direction = new Vector3(pointToLook.x, transform.position.y, pointToLook.z) - transform.position;
+        yaw += mouseX;
+        pitch -= mouseY;
+        pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 
-            // Ignore tiny/unstable directions when the cursor is very close to the player,
-            // which otherwise causes erratic spinning
-            if (direction.magnitude > 0.5f)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(direction);
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
-            }
-        }
+        // Only the player's body rotates left/right (yaw) - pitch is handled
+        // separately by the camera, so the character model doesn't tilt oddly
+        transform.rotation = Quaternion.Euler(0f, yaw, 0f);
+    }
+
+    // Lets other scripts (like CameraFollow) read the current up/down look angle
+    public float GetPitch()
+    {
+        return pitch;
     }
 
     // Reduces health when the player is hit, and triggers death/game over once health runs out
@@ -78,6 +111,7 @@ public class PlayerController : MonoBehaviour
 
         if (health <= 0)
         {
+            isDead = true;
             animationController.TriggerDie();
             GameManager.instance.GameOver();
         }

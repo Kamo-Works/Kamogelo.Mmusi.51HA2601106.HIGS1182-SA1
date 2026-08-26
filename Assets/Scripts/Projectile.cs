@@ -19,10 +19,5 @@ public class Projectile : MonoBehaviour
 
     }
 
-    // Destroys the laser and logs what it hit as soon as it touches anything
-    void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("Laser hit: " + other.name);
-        Destroy(gameObject);
-    }
+    
 }

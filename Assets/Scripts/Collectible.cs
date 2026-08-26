@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Collectible : MonoBehaviour
 {
-    public int scoreValue = 10;   // How much score this collectible is worth
+    public int scoreValue = 1;   // How much score this collectible is worth
 
     void Start()
     {

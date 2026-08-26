@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI highScoreText;
+    public int totalCollectiblesNeeded = 10;
+    public GameObject winPanel;
 
     public float difficultyTimer = 0f;     // Counts up each frame, used to check when to increase difficulty
     public float difficultyInterval = 10f; // How often (in seconds) difficulty increases
@@ -47,6 +49,16 @@ public class GameManager : MonoBehaviour
         score += amount;
         Debug.Log("Score " + score);
         scoreText.text = "Score: " + score;
+        CheckWinCondition();
+    }
+    public void CheckWinCondition()
+    {
+        if (score >= totalCollectiblesNeeded)
+        {
+            Debug.Log("All items collected - Player wins!");
+            Time.timeScale = 0f;
+            winPanel.SetActive(true);
+        }
     }
 
     // Called when the player's health reaches zero - saves high score, updates UI, shows Game Over panel
@@ -57,6 +69,9 @@ public class GameManager : MonoBehaviour
         SaveManager.instance.SaveHighScore(score);
         highScoreText.text = "High Score: " + SaveManager.instance.LoadHighScore();
         gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     // Resets score and reloads the Gameplay scene from scratch
@@ -65,6 +80,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Restarting game");
         score = 0;
         SceneManager.LoadScene("Gameplay");
+        Time.timeScale = 1f;
     }
 
     // Freezes/unfreezes gameplay using Time.timeScale, and shows/hides the pause panel
@@ -73,6 +89,8 @@ public class GameManager : MonoBehaviour
         isPaused = !isPaused;
         pausePanel.SetActive(isPaused);
         Time.timeScale = isPaused ? 0f : 1f;
+        Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = isPaused;
     }
 
     // Closes the application - only functions in a built .exe, not in the Unity Editor
