@@ -6,20 +6,22 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager instance;    // Single shared reference so other scripts can reach this GameManager easily
+    public static GameManager instance;
     public int score = 0;
     public TextMeshProUGUI scoreText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI highScoreText;
-    public int totalCollectiblesNeeded = 10;
-    public GameObject winPanel;
 
-    public float difficultyTimer = 0f;     // Counts up each frame, used to check when to increase difficulty
-    public float difficultyInterval = 10f; // How often (in seconds) difficulty increases
-    public float difficultyMultiplier = 1f; // Multiplies enemy speed - increases over time
+    public int totalCollectiblesNeeded = 10;   // How many items must be collected to win
+    public GameObject winPanel;                // Shown when the win condition is met
+
+    public float difficultyTimer = 0f;
+    public float difficultyInterval = 10f;
+    public float difficultyMultiplier = 1f;
 
     public GameObject pausePanel;
     private bool isPaused = false;
+    private bool gameEnded = false;            // True once the player has won or died, blocks pausing afterward
 
     void Start()
     {
@@ -28,7 +30,6 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // Difficulty ramps up automatically every 'difficultyInterval' seconds
         difficultyTimer += Time.deltaTime;
         if (difficultyTimer >= difficultyInterval)
         {
@@ -36,14 +37,13 @@ public class GameManager : MonoBehaviour
             IncreaseDifficulty();
         }
 
-        // Escape key toggles the pause menu on/off
-        if (Input.GetKeyDown(KeyCode.Escape))
+        // Escape toggles pause, but only if the game hasn't already ended (win/lose)
+        if (Input.GetKeyDown(KeyCode.Escape) && !gameEnded)
         {
             TogglePause();
         }
     }
 
-    // Adds to the player's score and updates the on-screen score UI
     public void AddScore(int amount)
     {
         score += amount;
@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour
         scoreText.text = "Score: " + score;
         CheckWinCondition();
     }
+
+    // Checks if enough items have been collected to win, and shows the Win panel if so
     public void CheckWinCondition()
     {
         if (score >= totalCollectiblesNeeded)
@@ -58,10 +60,13 @@ public class GameManager : MonoBehaviour
             Debug.Log("All items collected - Player wins!");
             Time.timeScale = 0f;
             winPanel.SetActive(true);
+
+            // Unlock the cursor so the player can click Restart/Exit on the Win panel
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
     }
 
-    // Called when the player's health reaches zero - saves high score, updates UI, shows Game Over panel
     public void GameOver()
     {
         Debug.Log("Game Over triggered");
@@ -70,11 +75,12 @@ public class GameManager : MonoBehaviour
         highScoreText.text = "High Score: " + SaveManager.instance.LoadHighScore();
         gameOverPanel.SetActive(true);
         Time.timeScale = 0f;
+
+        // Unlock the cursor so the player can click Restart/Exit on the Game Over panel
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
-    // Resets score and reloads the Gameplay scene from scratch
     public void RestartGame()
     {
         Debug.Log("Restarting game");
@@ -83,24 +89,24 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    // Freezes/unfreezes gameplay using Time.timeScale, and shows/hides the pause panel
     public void TogglePause()
     {
         isPaused = !isPaused;
         pausePanel.SetActive(isPaused);
         Time.timeScale = isPaused ? 0f : 1f;
+
+        // Unlock the cursor while paused so pause menu buttons are clickable,
+        // relock it when resuming so mouse-look works again
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
         Cursor.visible = isPaused;
     }
 
-    // Closes the application - only functions in a built .exe, not in the Unity Editor
     public void ExitGame()
     {
         Debug.Log("Exiting game");
         Application.Quit();
     }
 
-    // Gradually increases enemy speed over time to ramp up challenge
     void IncreaseDifficulty()
     {
         difficultyMultiplier += 0.2f;

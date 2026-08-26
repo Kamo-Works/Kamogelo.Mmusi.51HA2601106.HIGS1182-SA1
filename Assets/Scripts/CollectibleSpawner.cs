@@ -2,27 +2,31 @@ using UnityEngine;
 
 public class CollectibleSpawner : MonoBehaviour
 {
-    public GameObject collectiblePrefab;
-    public float spawnInterval = 4f;
-    public  Vector2 areaSize = new Vector2(20f, 20f);
+    public GameObject collectiblePrefab;       // The Collectible prefab to spawn
+    public float spawnInterval = 4f;           // Time in seconds between each spawn attempt
+    public Vector2 areaSize = new Vector2(20f, 20f); // Width/depth of the spawn area
     private float spawnTimer = 0f;
     private int spawnedCount = 0;
-    public int maxCollectibles = 10;
+    public int maxCollectibles = 10;           // Total collectibles allowed before spawning stops
+
     void Start()
     {
-        
+
     }
 
-    // Update is called once per frame
     void Update()
     {
         spawnTimer += Time.deltaTime;
+
         if (spawnTimer > spawnInterval)
         {
             spawnTimer = 0f;
             SpawnCollectible();
         }
     }
+
+    // Spawns a collectible at a random position within a rectangular area,
+    // stopping once maxCollectibles has been reached (supports the win condition)
     void SpawnCollectible()
     {
         if (spawnedCount >= maxCollectibles)

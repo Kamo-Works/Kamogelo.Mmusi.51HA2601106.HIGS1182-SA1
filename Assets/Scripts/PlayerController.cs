@@ -55,28 +55,43 @@ public class PlayerController : MonoBehaviour
     // to actually detect and destroy whatever was hit (asteroid or enemy)
     void Shoot()
     {
-        Instantiate(laserPrefab, firePoint.position, Camera.main.transform.rotation);
+        GameObject laser = Instantiate(laserPrefab, firePoint.position, Camera.main.transform.rotation);
 
         RaycastHit hit;
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hit, 100f))
         {
             Debug.Log("Raycast hit: " + hit.collider.name);
 
-            if (hit.collider.CompareTag("Asteroid"))
+            if (hit.collider.CompareTag("Asteroid") || hit.collider.CompareTag("Enemy"))
             {
-                Destroy(hit.collider.gameObject);
-                Debug.Log("Asteroid destroyed by raycast");
-            }
-            else if (hit.collider.CompareTag("Enemy"))
-            {
-                Destroy(hit.collider.gameObject);
-                Debug.Log("Enemy destroyed by raycast");
+                // Calculate how long the visible laser bolt would actually take to
+                // travel the distance to the target, then delay the destroy until then -
+                // this keeps the raycast's instant accuracy but makes it LOOK like the
+                // bullet is what caused the hit, not an invisible instant check
+                float laserSpeed = laser.GetComponent<Projectile>().speed;
+                float travelTime = hit.distance / laserSpeed;
+
+                StartCoroutine(DestroyAfterDelay(hit.collider.gameObject, travelTime));
             }
         }
 
         Debug.Log("Player fired");
         animationController.TriggerShoot();
         AudioManager.instance.PlaySound(AudioManager.instance.shootSound);
+    }
+
+    // Waits for the calculated travel time, then destroys the target -
+    // the null check guards against the target already being destroyed by something else
+    // in the meantime (e.g. another laser hitting it first)
+    IEnumerator DestroyAfterDelay(GameObject target, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (target != null)
+        {
+            Destroy(target);
+            Debug.Log(target.name + " destroyed on laser impact");
+        }
     }
 
     // Proper FPS-style mouse look: horizontal mouse movement turns the player (yaw),
