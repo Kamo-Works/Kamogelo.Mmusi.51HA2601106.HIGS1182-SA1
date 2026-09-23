@@ -16,6 +16,7 @@ public class AsteroidSpawner : MonoBehaviour
     {
         // Count up each frame, and spawn a new asteroid once the interval is reached
         spawnTimer += Time.deltaTime;
+        float currentInterval = spawnInterval / GameManager.instance.difficultyMultiplier;
 
         if (spawnTimer >= spawnInterval)
         {

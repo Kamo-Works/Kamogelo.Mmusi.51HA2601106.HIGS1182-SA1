@@ -5,9 +5,6 @@ public class EnemyAI : MonoBehaviour
     public float moveSpeed = 3f;
     private Transform player;
 
-    private bool canDamage = true;
-    public float damageCooldown = 1f;  // Time between repeated damage ticks while touching the player
-
     // --- Adapted from Sebastian Lague's Field of View system (github.com/SebLague/Field-of-View) ---
     // Original script detected multiple targets via a layer mask and returned a list of visible targets.
     // Simplified here into a single true/false check (CanSeePlayer) against one known target,
@@ -33,23 +30,18 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    // Deals damage repeatedly while the enemy stays in contact with the player, limited by a cooldown
-    void OnTriggerStay(Collider other)
+    // Colliding with the enemy kills the player instantly (unlike asteroids,
+    // which only deal partial damage) - reflects the enemy being a lethal threat
+    void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && canDamage)
+        if (other.CompareTag("Player"))
         {
-            other.GetComponent<PlayerController>().TakeDamage(1);
-            Debug.Log("Enemy hit player");
-            canDamage = false;
-            Invoke(nameof(ResetDamage), damageCooldown);
+            Debug.Log("Enemy caught player - instant death");
+            GameManager.instance.ShowFeedback("Caught by Enemy Drone!");
+            other.GetComponent<PlayerController>().TakeDamage(999);
         }
     }
 
-    // Re-enables damage after the cooldown period has passed
-    void ResetDamage()
-    {
-        canDamage = true;
-    }
 
     // Returns true if the player is within the enemy's view angle and view radius
     bool CanSeePlayer()

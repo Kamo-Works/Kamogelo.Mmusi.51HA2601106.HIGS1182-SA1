@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public GameObject laserPrefab;         // The laser prefab spawned when shooting
     public Transform firePoint;            // Marks where lasers spawn from (front of the player)
     public int health = 3;                 // Player's current health, starts at 3
-    public AnimationController animationController; // Reference to the character's animation script
+   
     public float mouseSensitivity = 3f;
     private float yaw;
     private float pitch;
@@ -40,8 +40,7 @@ public class PlayerController : MonoBehaviour
 
         // Tell the Animator whether to play the walk or idle animation
         bool isMoving = horizontal != 0f || vertical != 0f;
-        animationController.SetMoving(isMoving);
-
+      
         MouseLook();
 
         if (Input.GetMouseButtonDown(0))
@@ -76,7 +75,7 @@ public class PlayerController : MonoBehaviour
         }
 
         Debug.Log("Player fired");
-        animationController.TriggerShoot();
+      
         AudioManager.instance.PlaySound(AudioManager.instance.shootSound);
     }
 
@@ -89,8 +88,10 @@ public class PlayerController : MonoBehaviour
 
         if (target != null)
         {
+            string targetTag = target.tag;
             Destroy(target);
             Debug.Log(target.name + " destroyed on laser impact");
+            GameManager.instance.ShowFeedback(targetTag + "Destroyed!");
         }
     }
 
@@ -123,11 +124,10 @@ public class PlayerController : MonoBehaviour
         health -= amount;
         Debug.Log("Player health: " + health);
         AudioManager.instance.PlaySound(AudioManager.instance.hitSound);
-
+        GameManager.instance.ShowFeedback("Hit! Health: " + health);
         if (health <= 0)
         {
             isDead = true;
-            animationController.TriggerDie();
             GameManager.instance.GameOver();
         }
     }

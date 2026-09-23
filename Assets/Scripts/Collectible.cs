@@ -22,6 +22,7 @@ public class Collectible : MonoBehaviour
             GameManager.instance.AddScore(scoreValue);
             Debug.Log("Collectible picked up");
             AudioManager.instance.PlaySound(AudioManager.instance.pickupSound);
+            GameManager.instance.ShowFeedback("+" + scoreValue + " Scrap Collected!");
             Destroy(gameObject);
         }
     }

@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI scoreText;
     public GameObject gameOverPanel;
     public TextMeshProUGUI highScoreText;
+    public TextMeshProUGUI feedbackText;
 
     public int totalCollectiblesNeeded = 10;   // How many items must be collected to win
     public GameObject winPanel;                // Shown when the win condition is met
@@ -22,7 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject pausePanel;
     private bool isPaused = false;
     private bool gameEnded = false;            // True once the player has won or died, blocks pausing afterward
-
+    private int waveNumber = 1;
     void Start()
     {
         instance = this;
@@ -50,6 +51,23 @@ public class GameManager : MonoBehaviour
         Debug.Log("Score " + score);
         scoreText.text = "Score: " + score;
         CheckWinCondition();
+    }
+    // Shows a short message on screen for a couple of seconds, then hides it again -
+    // used for feedback on hits, kills, pickups, difficulty changes, and resets
+    public void ShowFeedback(string message)
+    {
+        StopAllCoroutines();
+        StartCoroutine(ShowFeedbackRoutine(message));
+    }
+
+    private IEnumerator ShowFeedbackRoutine(string message)
+    {
+        feedbackText.gameObject.SetActive(true);
+        feedbackText.text = message;
+
+        yield return new WaitForSecondsRealtime(1.5f);
+
+        feedbackText.gameObject.SetActive(false);
     }
 
     // Checks if enough items have been collected to win, and shows the Win panel if so
@@ -84,9 +102,16 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         Debug.Log("Restarting game");
+        StartCoroutine(RestartAfterFeedback());
+    }
+
+    private IEnumerator RestartAfterFeedback()
+    {
+        ShowFeedback("Restarting...");
+        yield return new WaitForSecondsRealtime(0.5f);
         score = 0;
-        SceneManager.LoadScene("Gameplay");
         Time.timeScale = 1f;
+        SceneManager.LoadScene("Gameplay");
     }
 
     public void TogglePause()
@@ -110,6 +135,8 @@ public class GameManager : MonoBehaviour
     void IncreaseDifficulty()
     {
         difficultyMultiplier += 0.2f;
+        waveNumber++;
         Debug.Log("Difficulty increased: " + difficultyMultiplier);
+        ShowFeedback("Wave "+  waveNumber + " - Asteroid Density Increasing!");
     }
 }
