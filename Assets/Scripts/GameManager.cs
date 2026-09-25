@@ -45,6 +45,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    // Adds to the player's score, updates the on-screen score UI, and checks for a win
     public void AddScore(int amount)
     {
         score += amount;
@@ -85,7 +87,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void GameOver()
+  // Called when the player's health reaches zero - saves high score, updates UI, shows Game Over panel
+  public void GameOver()
     {
         Debug.Log("Game Over triggered");
         AudioManager.instance.PlaySound(AudioManager.instance.hitSound);
@@ -99,6 +102,7 @@ public class GameManager : MonoBehaviour
         Cursor.visible = true;
     }
 
+    // Shows a brief message, then resets score and reloads the Gameplay scene
     public void RestartGame()
     {
         Debug.Log("Restarting game");
@@ -114,6 +118,7 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene("Gameplay");
     }
 
+    // Freezes/unfreezes gameplay using Time.timeScale, and shows/hides the pause panel
     public void TogglePause()
     {
         isPaused = !isPaused;
@@ -126,12 +131,15 @@ public class GameManager : MonoBehaviour
         Cursor.visible = isPaused;
     }
 
+    // Closes the application - only functions in a built .exe, not in the Unity Editor
     public void ExitGame()
     {
         Debug.Log("Exiting game");
         Application.Quit();
     }
 
+    // Gradually increases enemy speed and asteroid spawn rate over time,
+    // tracks the current wave number, and shows feedback to the player
     void IncreaseDifficulty()
     {
         difficultyMultiplier += 0.2f;

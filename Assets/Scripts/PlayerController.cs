@@ -38,8 +38,7 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = new Vector3(horizontal, 0f, vertical);
         transform.Translate(movement * moveSpeed * Time.deltaTime, Space.Self);
 
-        // Tell the Animator whether to play the walk or idle animation
-        bool isMoving = horizontal != 0f || vertical != 0f;
+       
       
         MouseLook();
 
@@ -49,7 +48,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // Spawns a laser projectile from the FirePoint and plays the shoot animation/sound
+    // Spawns a laser projectile from the FirePoint and plays the shootsound
     // Fires a visible laser bolt for feedback, while using an instant raycast
     // to actually detect and destroy whatever was hit (asteroid or enemy)
     void Shoot()
@@ -91,7 +90,7 @@ public class PlayerController : MonoBehaviour
             string targetTag = target.tag;
             Destroy(target);
             Debug.Log(target.name + " destroyed on laser impact");
-            GameManager.instance.ShowFeedback(targetTag + "Destroyed!");
+            GameManager.instance.ShowFeedback(targetTag + " Destroyed!");
         }
     }
 

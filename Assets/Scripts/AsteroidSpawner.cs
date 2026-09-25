@@ -18,7 +18,7 @@ public class AsteroidSpawner : MonoBehaviour
         spawnTimer += Time.deltaTime;
         float currentInterval = spawnInterval / GameManager.instance.difficultyMultiplier;
 
-        if (spawnTimer >= spawnInterval)
+        if (spawnTimer >= currentInterval)
         {
             spawnTimer = 0f;
             SpawnAsteroid();

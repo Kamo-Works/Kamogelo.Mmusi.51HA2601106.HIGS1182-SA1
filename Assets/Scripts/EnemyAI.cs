@@ -4,6 +4,7 @@ public class EnemyAI : MonoBehaviour
 {
     public float moveSpeed = 3f;
     private Transform player;
+    private bool hasSpottedPlayer = false;
 
     // --- Adapted from Sebastian Lague's Field of View system (github.com/SebLague/Field-of-View) ---
     // Original script detected multiple targets via a layer mask and returned a list of visible targets.
@@ -22,8 +23,21 @@ public class EnemyAI : MonoBehaviour
 
     void Update()
     {
-        // Only chase if the player is within the enemy's field of view
-        if (CanSeePlayer())
+        bool canSee = CanSeePlayer();
+
+        // Log only on the moment detection changes, not every single frame,
+        // so the Console isn't spammed while the enemy is chasing
+        if (canSee && !hasSpottedPlayer)
+        {
+            Debug.Log("Enemy Drone Spotted Player");
+            hasSpottedPlayer = true;
+        }
+        else if (!canSee && hasSpottedPlayer)
+        {
+            hasSpottedPlayer = false;
+        }
+
+        if (canSee)
         {
             float currentSpeed = moveSpeed * GameManager.instance.difficultyMultiplier;
             transform.position = Vector3.MoveTowards(transform.position, player.position, currentSpeed * Time.deltaTime);
